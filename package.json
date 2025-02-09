@@ -157,6 +157,11 @@
 					"default": "full",
 					"description": "Controls MCP inclusion in prompts, reduces token usage if you only need access to certain functionality."
 				},
+				"cline.openAiCompatProvider": {
+					"type": "string",
+					"default": "",
+					"description": "openAiCompatProvider"
+				},
 				"cline.enableCheckpoints": {
 					"type": "boolean",
 					"default": true,

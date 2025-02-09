@@ -6,6 +6,7 @@ import { ApiHandler } from "../index"
 import { convertToOpenAiMessages } from "../transform/openai-format"
 import { ApiStream } from "../transform/stream"
 import { convertToR1Format } from "../transform/r1-format"
+import * as vscode from "vscode"
 
 export class OpenAiHandler implements ApiHandler {
 	private options: ApiHandlerOptions
@@ -42,13 +43,15 @@ export class OpenAiHandler implements ApiHandler {
 			openAiMessages = convertToR1Format([{ role: "user", content: systemPrompt }, ...messages])
 		}
 
-		const stream = await this.client.chat.completions.create({
+		const openAiCompatProvider = vscode.workspace.getConfiguration("cline").get<boolean>("openAiCompatProvider") ?? true
+		const stream: any = await this.client.chat.completions.create({
+			provider: openAiCompatProvider,
 			model: modelId,
 			messages: openAiMessages,
 			temperature: 0,
 			stream: true,
 			stream_options: { include_usage: true },
-		})
+		} as any)
 		for await (const chunk of stream) {
 			const delta = chunk.choices[0]?.delta
 			if (delta?.content) {
