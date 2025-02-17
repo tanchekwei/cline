@@ -43,6 +43,25 @@ export class OpenAiHandler implements ApiHandler {
 			openAiMessages = convertToR1Format([{ role: "user", content: systemPrompt }, ...messages])
 		}
 
+		if (openAiMessages) {
+			openAiMessages = openAiMessages.map((message) => {
+				if (Array.isArray(message.content)) {
+					return {
+						...message,
+						content: message.content.map(item => {
+							if (typeof item === 'string') {
+								return item;
+							} else if (typeof item === 'object' && item.type === 'text') {
+								return item.text;
+							}
+							return '';
+						}).join(' ')
+					};
+				}
+				return message;
+			});
+		}
+
 		const openAiCompatProvider = vscode.workspace.getConfiguration("cline").get<boolean>("openAiCompatProvider") ?? true
 		const stream: any = await this.client.chat.completions.create({
 			provider: openAiCompatProvider,
